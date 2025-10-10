@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
+
 mod buffer;
 mod config;
 
@@ -19,20 +21,16 @@ fn main() -> Result<()> {
 	}
 	let mut buffer = EventBuffer::default();
 	for i in 1..5 {
-		buffer.push(&format!("Hi {i}!"));
+		buffer.push(format!("Hi {i}!"));
 	}
 	let mut rl = DefaultEditor::new()?;
-	loop {
-		let input = match rl.readline("") {
-			Ok(line) => line,
-			Err(_) => break,
-		};
+	while let Ok(input) = rl.readline("") {
 		let cmd = input.trim();
 		match cmd {
 			"" => {
 				if buffer.next() {
 					if let Some(line) = buffer.get() {
-						println!("{}", line);
+						println!("{line}");
 					}
 				} else {
 					println!("?");
@@ -41,7 +39,7 @@ fn main() -> Result<()> {
 			"-" => {
 				if buffer.prev() {
 					if let Some(line) = buffer.get() {
-						println!("{}", line);
+						println!("{line}");
 					}
 				} else {
 					println!("?");

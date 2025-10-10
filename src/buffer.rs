@@ -5,7 +5,7 @@ pub struct EventBuffer {
 }
 
 impl EventBuffer {
-	pub fn next(&mut self) -> bool {
+	pub const fn next(&mut self) -> bool {
 		if self.current < self.lines.len().saturating_sub(1) {
 			self.current += 1;
 			true
@@ -14,7 +14,7 @@ impl EventBuffer {
 		}
 	}
 
-	pub fn prev(&mut self) -> bool {
+	pub const fn prev(&mut self) -> bool {
 		if self.current > 0 {
 			self.current -= 1;
 			true
@@ -28,18 +28,14 @@ impl EventBuffer {
 	}
 
 	pub fn get(&self) -> Option<&str> {
-		self.lines.get(self.current).map(|s| s.as_str())
+		self.lines.get(self.current).map(String::as_str)
 	}
 
-	pub fn cursor(&self) -> usize {
+	pub const fn cursor(&self) -> usize {
 		self.current
 	}
 
-	pub fn len(&self) -> usize {
+	pub const fn len(&self) -> usize {
 		self.lines.len()
-	}
-
-	pub fn is_empty(&self) -> bool {
-		self.lines.is_empty()
 	}
 }
