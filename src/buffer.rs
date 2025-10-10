@@ -38,4 +38,17 @@ impl EventBuffer {
 	pub const fn len(&self) -> usize {
 		self.lines.len()
 	}
+
+	pub const fn line_number(&self) -> usize {
+		self.current + 1
+	}
+
+	pub fn goto(&mut self, line: usize) -> bool {
+		if line > 0 && line <= self.lines.len() {
+			self.current = line - 1;
+			true
+		} else {
+			false
+		}
+	}
 }

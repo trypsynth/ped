@@ -1,6 +1,7 @@
 #![warn(clippy::all, clippy::pedantic, clippy::nursery)]
 
 mod buffer;
+mod commands;
 mod config;
 
 use std::process;
@@ -8,7 +9,7 @@ use std::process;
 use anyhow::Result;
 use rustyline::DefaultEditor;
 
-use crate::{buffer::EventBuffer, config::Config};
+use crate::{buffer::EventBuffer, commands::Command, config::Config};
 
 fn main() -> Result<()> {
 	let mut config = Config::load()?;
@@ -25,9 +26,9 @@ fn main() -> Result<()> {
 	}
 	let mut rl = DefaultEditor::new()?;
 	while let Ok(input) = rl.readline("") {
-		let cmd = input.trim();
+		let cmd = Command::parse(input.trim());
 		match cmd {
-			"" => {
+			Command::Next => {
 				if buffer.next() {
 					if let Some(line) = buffer.get() {
 						println!("{line}");
@@ -36,7 +37,7 @@ fn main() -> Result<()> {
 					println!("?");
 				}
 			}
-			"-" => {
+			Command::Prev => {
 				if buffer.prev() {
 					if let Some(line) = buffer.get() {
 						println!("{line}");
@@ -45,8 +46,28 @@ fn main() -> Result<()> {
 					println!("?");
 				}
 			}
-			"q" => break,
-			_ => {}
+			Command::PrintCurrent => {
+				if let Some(line) = buffer.get() {
+					println!("{line}");
+				}
+			}
+			Command::PrintLineNumber => {
+				println!("{}", buffer.line_number());
+			}
+			Command::PrintTotalLines => {
+				println!("{}", buffer.len());
+			}
+			Command::Goto(line) => {
+				if buffer.goto(line) {
+					if let Some(content) = buffer.get() {
+						println!("{content}");
+					}
+				} else {
+					println!("?");
+				}
+			}
+			Command::Quit => break,
+			Command::Unknown => println!("?"),
 		}
 	}
 	Ok(())
