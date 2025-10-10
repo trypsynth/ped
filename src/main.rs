@@ -17,15 +17,40 @@ fn main() -> Result<()> {
 		config.name = name;
 		config.save()?;
 	}
-	let mut event_buf = EventBuffer::default();
+	let mut buffer = EventBuffer::default();
 	for i in 1..5 {
-		event_buf.push(&format!("Hi {i}!"));
+		buffer.push(&format!("Hi {i}!"));
 	}
-	println!("Current: {} len: {}", event_buf.cursor(), event_buf.len());
-	event_buf.next();
-	println!("Current: {} len: {}", event_buf.cursor(), event_buf.len());
-	event_buf.next();
-	println!("Current: {} len: {}", event_buf.cursor(), event_buf.len());
+	let mut rl = DefaultEditor::new()?;
+	loop {
+		let input = match rl.readline("") {
+			Ok(line) => line,
+			Err(_) => break,
+		};
+		let cmd = input.trim();
+		match cmd {
+			"" => {
+				if buffer.next() {
+					if let Some(line) = buffer.get() {
+						println!("{}", line);
+					}
+				} else {
+					println!("?");
+				}
+			}
+			"-" => {
+				if buffer.prev() {
+					if let Some(line) = buffer.get() {
+						println!("{}", line);
+					}
+				} else {
+					println!("?");
+				}
+			}
+			"q" => break,
+			_ => {}
+		}
+	}
 	Ok(())
 }
 
