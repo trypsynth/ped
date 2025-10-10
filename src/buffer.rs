@@ -31,10 +31,6 @@ impl EventBuffer {
 		self.lines.get(self.current).map(String::as_str)
 	}
 
-	pub const fn cursor(&self) -> usize {
-		self.current
-	}
-
 	pub const fn len(&self) -> usize {
 		self.lines.len()
 	}

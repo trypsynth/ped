@@ -27,47 +27,8 @@ fn main() -> Result<()> {
 	let mut rl = DefaultEditor::new()?;
 	while let Ok(input) = rl.readline("") {
 		let cmd = Command::parse(input.trim());
-		match cmd {
-			Command::Next => {
-				if buffer.next() {
-					if let Some(line) = buffer.get() {
-						println!("{line}");
-					}
-				} else {
-					println!("?");
-				}
-			}
-			Command::Prev => {
-				if buffer.prev() {
-					if let Some(line) = buffer.get() {
-						println!("{line}");
-					}
-				} else {
-					println!("?");
-				}
-			}
-			Command::PrintCurrent => {
-				if let Some(line) = buffer.get() {
-					println!("{line}");
-				}
-			}
-			Command::PrintLineNumber => {
-				println!("{}", buffer.line_number());
-			}
-			Command::PrintTotalLines => {
-				println!("{}", buffer.len());
-			}
-			Command::Goto(line) => {
-				if buffer.goto(line) {
-					if let Some(content) = buffer.get() {
-						println!("{content}");
-					}
-				} else {
-					println!("?");
-				}
-			}
-			Command::Quit => break,
-			Command::Unknown => println!("?"),
+		if !cmd.execute(&mut buffer) {
+			break;
 		}
 	}
 	Ok(())
