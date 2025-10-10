@@ -1,4 +1,4 @@
-use crate::buffer::EventBuffer;
+use crate::{buffer::EventBuffer, config::Config};
 
 pub enum Command {
 	NextLine,
@@ -7,6 +7,7 @@ pub enum Command {
 	PrintLineNumber,
 	PrintTotalLines,
 	Goto(usize),
+	ShowStats,
 	Quit,
 	Unknown,
 }
@@ -19,6 +20,7 @@ impl Command {
 			"." => Self::PrintLine,
 			".=" => Self::PrintLineNumber,
 			"=" => Self::PrintTotalLines,
+			"s" => Self::ShowStats,
 			"q" => Self::Quit,
 			_ => {
 				if let Ok(line) = input.parse::<usize>() {
@@ -30,26 +32,14 @@ impl Command {
 		}
 	}
 
-	pub fn execute(&self, buffer: &mut EventBuffer) -> bool {
+	pub fn execute(&self, buffer: &mut EventBuffer, config: &Config) -> bool {
 		match self {
 			Self::NextLine => {
-				if buffer.next() {
-					if let Some(line) = buffer.get() {
-						println!("{line}");
-					}
-				} else {
-					println!("?");
-				}
+				buffer.next();
 				true
 			}
 			Self::PrevLine => {
-				if buffer.prev() {
-					if let Some(line) = buffer.get() {
-						println!("{line}");
-					}
-				} else {
-					println!("?");
-				}
+				buffer.prev();
 				true
 			}
 			Self::PrintLine => {
@@ -67,13 +57,13 @@ impl Command {
 				true
 			}
 			Self::Goto(line) => {
-				if buffer.goto(*line) {
-					if let Some(content) = buffer.get() {
-						println!("{content}");
-					}
-				} else {
-					println!("?");
-				}
+				buffer.goto(*line);
+				true
+			}
+			Self::ShowStats => {
+				let stats = config.display_stats();
+				buffer.push(stats);
+				buffer.goto(buffer.len());
 				true
 			}
 			Self::Quit => false,

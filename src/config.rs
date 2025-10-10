@@ -8,9 +8,35 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{Serializer, ser::PrettyFormatter};
 
-#[derive(Deserialize, Serialize, Default)]
+#[derive(Deserialize, Serialize)]
 pub struct Config {
+	#[serde(default)]
 	pub name: String,
+	#[serde(default = "default_hunger")]
+	pub hunger: u8,
+	#[serde(default = "default_happiness")]
+	pub happiness: u8,
+	#[serde(default = "default_energy")]
+	pub energy: u8,
+	#[serde(default = "default_health")]
+	pub health: u8,
+}
+
+fn default_hunger() -> u8 { 50 }
+fn default_happiness() -> u8 { 50 }
+fn default_energy() -> u8 { 50 }
+fn default_health() -> u8 { 100 }
+
+impl Default for Config {
+	fn default() -> Self {
+		Self {
+			name: String::new(),
+			hunger: 50,
+			happiness: 50,
+			energy: 50,
+			health: 100,
+		}
+	}
 }
 
 impl Config {
@@ -41,5 +67,12 @@ impl Config {
 		file.write_all(&buf)?;
 		file.write_all(b"\n")?;
 		Ok(())
+	}
+
+	pub fn display_stats(&self) -> String {
+		format!(
+			"name: {}, Hunger: {}%, happiness: {}%, energy: {}%, health: {}%.",
+			self.name, self.hunger, self.happiness, self.energy, self.health
+		)
 	}
 }

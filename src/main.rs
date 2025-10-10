@@ -21,13 +21,10 @@ fn main() -> Result<()> {
 		config.save()?;
 	}
 	let mut buffer = EventBuffer::default();
-	for i in 1..5 {
-		buffer.push(format!("Hi {i}!"));
-	}
 	let mut rl = DefaultEditor::new()?;
 	while let Ok(input) = rl.readline("") {
 		let cmd = Command::parse(input.trim());
-		if !cmd.execute(&mut buffer) {
+		if !cmd.execute(&mut buffer, &config) {
 			break;
 		}
 	}
