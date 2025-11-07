@@ -14,8 +14,10 @@ pub enum Command {
 
 impl Command {
 	pub fn parse(input: &str) -> Self {
+		if input.is_empty() {
+			return Self::NextLine;
+		}
 		match input {
-			"" => Self::NextLine,
 			"-" => Self::PrevLine,
 			"." => Self::PrintLine,
 			".=" => Self::PrintLineNumber,
@@ -45,6 +47,8 @@ impl Command {
 			Self::PrintLine => {
 				if let Some(line) = buffer.get() {
 					println!("{line}");
+				} else {
+					println!("?");
 				}
 				true
 			}

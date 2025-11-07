@@ -22,20 +22,22 @@ pub struct Config {
 	pub health: u8,
 }
 
-fn default_hunger() -> u8 { 50 }
-fn default_happiness() -> u8 { 50 }
-fn default_energy() -> u8 { 50 }
-fn default_health() -> u8 { 100 }
+fn default_hunger() -> u8 {
+	50
+}
+fn default_happiness() -> u8 {
+	50
+}
+fn default_energy() -> u8 {
+	50
+}
+fn default_health() -> u8 {
+	100
+}
 
 impl Default for Config {
 	fn default() -> Self {
-		Self {
-			name: String::new(),
-			hunger: 50,
-			happiness: 50,
-			energy: 50,
-			health: 100,
-		}
+		Self { name: String::new(), hunger: 50, happiness: 50, energy: 50, health: 100 }
 	}
 }
 

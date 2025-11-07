@@ -21,6 +21,7 @@ fn main() -> Result<()> {
 		config.save()?;
 	}
 	let mut buffer = EventBuffer::default();
+	buffer.push(format!("{} welcomes you.", config.name));
 	let mut rl = DefaultEditor::new()?;
 	while let Ok(input) = rl.readline("") {
 		let cmd = Command::parse(input.trim());
