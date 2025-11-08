@@ -37,11 +37,17 @@ impl Command {
 	pub fn execute(&self, buffer: &mut EventBuffer, config: &Config) -> bool {
 		match self {
 			Self::NextLine => {
-				buffer.next();
+				match buffer.next() {
+					Some(line) => println!("{line}"),
+					None => println!("?"),
+				}
 				true
 			}
 			Self::PrevLine => {
-				buffer.prev();
+				match buffer.prev() {
+					Some(line) => println!("{line}"),
+					None => println!("?"),
+				}
 				true
 			}
 			Self::PrintLine => {

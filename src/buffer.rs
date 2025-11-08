@@ -5,25 +5,21 @@ pub struct EventBuffer {
 }
 
 impl EventBuffer {
-	pub fn next(&mut self) {
+	pub fn next(&mut self) -> Option<&str> {
 		if self.current < self.lines.len().saturating_sub(1) {
 			self.current += 1;
-			if let Some(line) = self.get() {
-				println!("{line}");
-			}
+			self.get()
 		} else {
-			println!("?");
+			None
 		}
 	}
 
-	pub fn prev(&mut self) {
+	pub fn prev(&mut self) -> Option<&str> {
 		if self.current > 0 {
 			self.current -= 1;
-			if let Some(line) = self.get() {
-				println!("{line}");
-			}
+			self.get()
 		} else {
-			println!("?");
+			None
 		}
 	}
 
@@ -43,14 +39,12 @@ impl EventBuffer {
 		self.current + 1
 	}
 
-	pub fn goto(&mut self, line: usize) {
+	pub fn goto(&mut self, line: usize) -> Option<&str> {
 		if line > 0 && line <= self.lines.len() {
 			self.current = line - 1;
-			if let Some(content) = self.get() {
-				println!("{content}");
-			}
+			self.get()
 		} else {
-			println!("?");
+			None
 		}
 	}
 }
