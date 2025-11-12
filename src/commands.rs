@@ -67,7 +67,10 @@ impl Command {
 				true
 			}
 			Self::Goto(line) => {
-				buffer.goto(*line);
+				match buffer.goto(*line) {
+					Some(line) => println!("{line}"),
+					None => println!("?"),
+				}
 				true
 			}
 			Self::ShowStats => {
