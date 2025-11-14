@@ -24,13 +24,7 @@ impl Command {
 			"=" => Self::PrintTotalLines,
 			"s" => Self::ShowStats,
 			"q" => Self::Quit,
-			_ => {
-				if let Ok(line) = input.parse::<usize>() {
-					Self::Goto(line)
-				} else {
-					Self::Unknown
-				}
-			}
+			_ => input.parse::<usize>().map_or(Self::Unknown, Self::Goto),
 		}
 	}
 

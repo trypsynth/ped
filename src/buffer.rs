@@ -41,8 +41,8 @@ impl EventBuffer {
 
 	pub fn goto(&mut self, line: usize) -> Option<&str> {
 		self.lines.get(line - 1).map(|s| {
-				self.current = line - 1;
-				s.as_str()
+			self.current = line - 1;
+			s.as_str()
 		})
 	}
 }
