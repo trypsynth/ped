@@ -12,6 +12,7 @@ use rustyline::DefaultEditor;
 use crate::{buffer::EventBuffer, commands::Command, config::Config};
 
 fn main() -> Result<()> {
+	let mut buffer = EventBuffer::default();
 	let mut config = Config::load()?;
 	if config.name.is_empty() {
 		let Some(name) = ask_for_name() else {
@@ -19,9 +20,8 @@ fn main() -> Result<()> {
 		};
 		config.name = name;
 		config.save()?;
+		buffer.push(format!("{} welcomes you.", config.name));
 	}
-	let mut buffer = EventBuffer::default();
-	buffer.push(format!("{} welcomes you.", config.name));
 	let mut rl = DefaultEditor::new()?;
 	while let Ok(input) = rl.readline("") {
 		let cmd = Command::parse(input.trim());

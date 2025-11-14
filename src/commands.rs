@@ -14,7 +14,7 @@ pub enum Command {
 
 impl Command {
 	pub fn parse(input: &str) -> Self {
-		if input.is_empty() {
+		if input.trim().is_empty() {
 			return Self::NextLine;
 		}
 		match input {
