@@ -45,7 +45,7 @@ impl Default for Config {
 impl Config {
 	pub fn path() -> Result<PathBuf> {
 		let proj = ProjectDirs::from("", "", "ped").context("failed to get project directories")?;
-		let base = proj.data_local_dir();
+		let base = proj.config_dir();
 		Ok(base.join("pet.json"))
 	}
 
