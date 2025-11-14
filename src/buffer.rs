@@ -6,7 +6,7 @@ pub struct EventBuffer {
 
 impl EventBuffer {
 	pub fn next(&mut self) -> Option<&str> {
-		if self.current < self.lines.len().saturating_sub(1) {
+		if self.current + 1 < self.lines.len() {
 			self.current += 1;
 			self.get()
 		} else {
@@ -40,11 +40,9 @@ impl EventBuffer {
 	}
 
 	pub fn goto(&mut self, line: usize) -> Option<&str> {
-		if line > 0 && line <= self.lines.len() {
-			self.current = line - 1;
-			self.get()
-		} else {
-			None
-		}
+		self.lines.get(line - 1).map(|s| {
+				self.current = line - 1;
+				s.as_str()
+		})
 	}
 }
