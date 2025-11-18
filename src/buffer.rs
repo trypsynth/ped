@@ -6,21 +6,25 @@ pub struct EventBuffer {
 
 impl EventBuffer {
 	pub fn next(&mut self) -> Option<&str> {
-		if self.current + 1 < self.lines.len() {
-			self.current += 1;
-			self.get()
-		} else {
-			None
-		}
+		self.move_by(1)
 	}
 
 	pub fn prev(&mut self) -> Option<&str> {
-		if self.current > 0 {
-			self.current -= 1;
-			self.get()
-		} else {
-			None
+		self.move_by(-1)
+	}
+
+	pub fn move_by(&mut self, offset: isize) -> Option<&str> {
+		if self.lines.is_empty() {
+			return None;
 		}
+		let Some(target) = (self.current as isize).checked_add(offset) else {
+			return None;
+		};
+		if !(0..self.lines.len() as isize).contains(&target) {
+			return None;
+		}
+		self.current = target as usize;
+		self.get()
 	}
 
 	pub fn push(&mut self, line: impl Into<String>) {

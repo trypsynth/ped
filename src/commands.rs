@@ -1,8 +1,7 @@
 use crate::{buffer::EventBuffer, config::Config};
 
 pub enum Command {
-	NextLine,
-	PrevLine,
+	Move(isize),
 	PrintLine,
 	PrintLineNumber,
 	PrintTotalLines,
@@ -14,31 +13,44 @@ pub enum Command {
 
 impl Command {
 	pub fn parse(input: &str) -> Self {
-		if input.trim().is_empty() {
-			return Self::NextLine;
+		let trimmed = input.trim();
+		if trimmed.is_empty() {
+			return Self::Move(1);
 		}
-		match input {
-			"-" => Self::PrevLine,
+		if let Some(step) = Self::parse_relative(trimmed, '+') {
+			return Self::Move(step);
+		}
+		if let Some(step) = Self::parse_relative(trimmed, '-') {
+			return Self::Move(-step);
+		}
+		match trimmed {
 			"." => Self::PrintLine,
 			".=" => Self::PrintLineNumber,
 			"=" => Self::PrintTotalLines,
 			"s" => Self::ShowStats,
 			"q" => Self::Quit,
-			_ => input.parse::<usize>().map_or(Self::Unknown, Self::Goto),
+			_ => trimmed.parse::<usize>().map_or(Self::Unknown, Self::Goto),
 		}
+	}
+
+	fn parse_relative(input: &str, symbol: char) -> Option<isize> {
+		if input.chars().all(|c| c == symbol) {
+			return isize::try_from(input.len()).ok();
+		}
+		if input.starts_with(symbol) {
+			let rest = &input[1..];
+			if rest.chars().all(|c| c.is_ascii_digit()) {
+				let count = rest.parse::<usize>().ok()?;
+				return isize::try_from(count).ok();
+			}
+		}
+		None
 	}
 
 	pub fn execute(&self, buffer: &mut EventBuffer, config: &Config) -> bool {
 		match self {
-			Self::NextLine => {
-				match buffer.next() {
-					Some(line) => println!("{line}"),
-					None => println!("?"),
-				}
-				true
-			}
-			Self::PrevLine => {
-				match buffer.prev() {
+			Self::Move(offset) => {
+				match buffer.move_by(*offset) {
 					Some(line) => println!("{line}"),
 					None => println!("?"),
 				}
