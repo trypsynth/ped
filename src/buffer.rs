@@ -5,25 +5,19 @@ pub struct EventBuffer {
 }
 
 impl EventBuffer {
-	pub fn next(&mut self) -> Option<&str> {
-		self.move_by(1)
-	}
-
-	pub fn prev(&mut self) -> Option<&str> {
-		self.move_by(-1)
-	}
-
 	pub fn move_by(&mut self, offset: isize) -> Option<&str> {
 		if self.lines.is_empty() {
 			return None;
 		}
-		let Some(target) = (self.current as isize).checked_add(offset) else {
-			return None;
+		let target = if offset >= 0 {
+			self.current.checked_add(usize::try_from(offset).ok()?)?
+		} else {
+			self.current.checked_sub(offset.unsigned_abs())?
 		};
-		if !(0..self.lines.len() as isize).contains(&target) {
+		if target >= self.lines.len() {
 			return None;
 		}
-		self.current = target as usize;
+		self.current = target;
 		self.get()
 	}
 
