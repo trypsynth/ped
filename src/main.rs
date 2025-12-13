@@ -4,10 +4,12 @@ mod buffer;
 mod commands;
 mod config;
 
-use std::process;
+use std::{
+	io::{self, BufRead, Write},
+	process,
+};
 
 use anyhow::Result;
-use rustyline::DefaultEditor;
 
 use crate::{buffer::EventBuffer, commands::Command, config::Config};
 
@@ -22,9 +24,16 @@ fn main() -> Result<()> {
 		config.save()?;
 		buffer.push(format!("{} welcomes you.", config.name));
 	}
-	let mut rl = DefaultEditor::new()?;
-	while let Ok(input) = rl.readline("") {
-		let cmd = Command::parse(input.trim());
+	let stdin = io::stdin();
+	let mut stdin = stdin.lock();
+	let mut line = String::new();
+	loop {
+		line.clear();
+		let bytes_read = stdin.read_line(&mut line)?;
+		if bytes_read == 0 {
+			break;
+		}
+		let cmd = Command::parse(line.trim());
 		if !cmd.execute(&mut buffer, &config) {
 			break;
 		}
@@ -33,8 +42,10 @@ fn main() -> Result<()> {
 }
 
 fn ask_for_name() -> Option<String> {
-	let mut rl = DefaultEditor::new().ok()?;
-	let line = rl.readline("Name: ").ok()?;
+	print!("Name: ");
+	io::stdout().flush().ok()?;
+	let mut line = String::new();
+	io::stdin().read_line(&mut line).ok()?;
 	let name = line.trim();
 	if name.is_empty() { None } else { Some(name.to_string()) }
 }

@@ -5,7 +5,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
-use directories::ProjectDirs;
+use etcetera::{BaseStrategy, choose_base_strategy};
 use serde::{Deserialize, Serialize};
 use serde_json::{Serializer, ser::PrettyFormatter};
 
@@ -44,9 +44,8 @@ impl Default for Config {
 
 impl Config {
 	pub fn path() -> Result<PathBuf> {
-		let proj = ProjectDirs::from("", "", "ped").context("failed to get project directories")?;
-		let base = proj.config_dir();
-		Ok(base.join("pet.json"))
+		let base = choose_base_strategy().context("failed to get base directories")?;
+		Ok(base.config_dir().join("ped").join("pet.json"))
 	}
 
 	pub fn load() -> Result<Self> {
@@ -75,7 +74,7 @@ impl Config {
 
 	pub fn display_stats(&self) -> String {
 		format!(
-			"name: {}, Hunger: {}%, happiness: {}%, energy: {}%, health: {}%.",
+			"name: {}, hunger: {}%, happiness: {}%, energy: {}%, health: {}%.",
 			self.name, self.hunger, self.happiness, self.energy, self.health
 		)
 	}
