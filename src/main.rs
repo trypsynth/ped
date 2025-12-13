@@ -25,11 +25,10 @@ fn main() -> Result<()> {
 		buffer.push(format!("{} welcomes you.", config.name));
 	}
 	let stdin = io::stdin();
-	let mut stdin = stdin.lock();
 	let mut line = String::new();
 	loop {
 		line.clear();
-		let bytes_read = stdin.read_line(&mut line)?;
+		let bytes_read = stdin.lock().read_line(&mut line)?;
 		if bytes_read == 0 {
 			break;
 		}
