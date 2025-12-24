@@ -2,6 +2,6 @@
     .name = .ped,
     .version = "0.0.1",
     .minimum_zig_version = "0.15.2",
-    .paths = .{""},
+    .paths = .{"src"},
     .fingerprint = 0xf9e58be15ae1192e,
 }
