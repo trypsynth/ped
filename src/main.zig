@@ -1,16 +1,19 @@
 const std = @import("std");
+const fs = std.fs;
+const heap = std.heap;
+const mem = std.mem;
 
 const Config = struct {
-    fn load(allocator: std.mem.Allocator) !void {
-        const data_dir = try std.fs.getAppDataDir(allocator, "ped");
+    fn load(allocator: mem.Allocator) !void {
+        const data_dir = try fs.getAppDataDir(allocator, "ped");
         defer allocator.free(data_dir);
-        std.fs.makeDirAbsolute(data_dir) catch |err| switch (err) {
+        fs.makeDirAbsolute(data_dir) catch |err| switch (err) {
             error.PathAlreadyExists => {},
             else => return err,
         };
-        const config_path = try std.fs.path.join(allocator, &[_][]const u8{ data_dir, "config.json" });
+        const config_path = try fs.path.join(allocator, &[_][]const u8{ data_dir, "config.json" });
         defer allocator.free(config_path);
-        const file = try std.fs.cwd().createFile(config_path, .{});
+        const file = try fs.cwd().createFile(config_path, .{});
         defer file.close();
     }
 };
@@ -20,6 +23,6 @@ const Pet = struct {
 };
 
 pub fn main() !void {
-    const allocator = std.heap.page_allocator;
+    const allocator = heap.page_allocator;
     try Config.load(allocator);
 }
