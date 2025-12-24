@@ -1,4 +1,5 @@
 const std = @import("std");
+const debug = std.debug;
 const fs = std.fs;
 const heap = std.heap;
 const mem = std.mem;
@@ -15,6 +16,10 @@ const Config = struct {
         defer allocator.free(config_path);
         const file = try fs.cwd().createFile(config_path, .{});
         defer file.close();
+        var file_buf: [256]u8 = undefined;
+        var reader = file.reader(&file_buf);
+        const content = try reader.interface.allocRemaining(allocator, .unlimited);
+        debug.print("got {s}\n", .{content});
     }
 };
 
