@@ -23,6 +23,5 @@ func promptForName() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	line = strings.TrimSpace(line)
-	return line, nil
+	return strings.TrimSpace(line), nil
 }
