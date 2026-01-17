@@ -58,96 +58,55 @@ func runBuffer(lines []string, in io.Reader, out io.Writer) {
 			fmt.Fprintln(out, "?")
 			return
 		}
+		eof := err == io.EOF
 		cmd := strings.TrimSpace(line)
-		if cmd == "q" {
+		switch {
+		case cmd == "q":
 			return
-		}
-		if cmd == "=" {
+		case cmd == "=":
 			fmt.Fprintln(out, len(buffer.lines))
-			if err == io.EOF {
-				return
-			}
-			continue
-		}
-		if cmd == ".=" {
+		case cmd == ".=":
 			fmt.Fprintln(out, buffer.index+1)
-			if err == io.EOF {
-				return
-			}
-			continue
-		}
-		if cmd == "." {
+		case cmd == ".":
 			fmt.Fprintln(out, buffer.current())
-			if err == io.EOF {
-				return
-			}
-			continue
-		}
-		if cmd == "" {
-			if !buffer.move(1) {
-				fmt.Fprintln(out, "?")
-			} else {
-				fmt.Fprintln(out, buffer.current())
-			}
-			if err == io.EOF {
-				return
-			}
-			continue
-		}
-		if isRun(cmd, '+') {
-			if !buffer.move(len(cmd)) {
-				fmt.Fprintln(out, "?")
-			} else {
-				fmt.Fprintln(out, buffer.current())
-			}
-			if err == io.EOF {
-				return
-			}
-			continue
-		}
-		if isRun(cmd, '-') {
-			if !buffer.move(-len(cmd)) {
-				fmt.Fprintln(out, "?")
-			} else {
-				fmt.Fprintln(out, buffer.current())
-			}
-			if err == io.EOF {
-				return
-			}
-			continue
-		}
-		if len(cmd) > 1 && (cmd[0] == '+' || cmd[0] == '-') && isDigits(cmd[1:]) {
+		case cmd == "":
+			printMoveResult(out, buffer.move(1), buffer.current())
+		case isRun(cmd, '+'):
+			printMoveResult(out, buffer.move(len(cmd)), buffer.current())
+		case isRun(cmd, '-'):
+			printMoveResult(out, buffer.move(-len(cmd)), buffer.current())
+		case len(cmd) > 1 && (cmd[0] == '+' || cmd[0] == '-') && isDigits(cmd[1:]):
 			steps, _ := strconv.Atoi(cmd[1:])
+			if steps == 0 {
+				printInvalid(out)
+				break
+			}
 			if cmd[0] == '-' {
 				steps = -steps
 			}
-			if !buffer.move(steps) {
-				fmt.Fprintln(out, "?")
-			} else {
-				fmt.Fprintln(out, buffer.current())
-			}
-			if err == io.EOF {
-				return
-			}
-			continue
-		}
-		if isDigits(cmd) {
+			printMoveResult(out, buffer.move(steps), buffer.current())
+		case isDigits(cmd):
 			target, _ := strconv.Atoi(cmd)
-			if !buffer.jump(target) {
-				fmt.Fprintln(out, "?")
-			} else {
-				fmt.Fprintln(out, buffer.current())
-			}
-			if err == io.EOF {
-				return
-			}
-			continue
+			printMoveResult(out, buffer.jump(target), buffer.current())
+		default:
+			printInvalid(out)
 		}
-		fmt.Fprintln(out, "?")
-		if err == io.EOF {
+		if eof {
 			return
 		}
 	}
+}
+
+func printMoveResult(out io.Writer, ok bool, line string) {
+	if !ok {
+		printInvalid(out)
+		return
+	}
+	fmt.Fprintln(out, line)
+}
+
+func printInvalid(out io.Writer) {
+	fmt.Fprintln(out, "?")
 }
 
 func isRun(value string, target byte) bool {
